@@ -1,0 +1,27 @@
+{
+  "name": "construct-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "constructOS - Enterprise Construction Materials Management System",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm --prefix apps/api run dev",
+    "dev:web": "npm --prefix apps/web run dev",
+    "build:api": "npm --prefix apps/api run build",
+    "build:web": "npm --prefix apps/web run build",
+    "build": "npm run build:api && npm run build:web",
+    "seed": "npm --prefix apps/api run prisma:seed",
+    "docker:up": "docker compose -f docker-compose.demo.yml up -d --build",
+    "docker:down": "docker compose -f docker-compose.demo.yml down"
+  },
+  "keywords": [
+    "construction-erp",
+    "inventory-management",
+    "pos",
+    "material-sales"
+  ],
+  "author": "constructOS Team",
+  "license": "MIT"
+}

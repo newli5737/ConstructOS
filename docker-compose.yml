@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: constructos_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: constructos_db_pass_2026
+      POSTGRES_DB: constructos_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - constructos_network
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: constructos_api
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:constructos_db_pass_2026@postgres:5432/constructos_db?schema=public
+      JWT_SECRET: constructos_super_jwt_secret_key_2026
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - constructos_network
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      args:
+        VITE_API_URL: https://api-construct.bloxtcgshop.com/api/v1
+    container_name: constructos_web
+    restart: always
+    depends_on:
+      - api
+    networks:
+      - constructos_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: constructos_proxy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - web
+      - api
+    networks:
+      - constructos_network
+
+volumes:
+  postgres_data:
+
+networks:
+  constructos_network:
+    driver: bridge

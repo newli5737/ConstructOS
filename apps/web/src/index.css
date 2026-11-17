@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-radius: 2px !important;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f5;
+    color: #18181b;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Monospace numbers for accounting and stock */
+  .font-mono, td, th {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Print CSS for Clean A4 */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  header, aside, button, nav, .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+}
