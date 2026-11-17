@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Plus, Search, Phone, MapPin, X } from 'lucide-react';
 import { api, formatMoney } from '../api/client';
 import { Supplier } from '../types';
+import { useToast } from '../context/ToastContext';
 
 export const SuppliersPage: React.FC = () => {
+  const { toast } = useToast();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -33,7 +35,7 @@ export const SuppliersPage: React.FC = () => {
 
   const handleCreateSupplier = async () => {
     if (!name) {
-      alert('Vui lòng nhập tên nhà cung cấp');
+      toast.warning('Vui lòng nhập tên nhà cung cấp');
       return;
     }
     try {
@@ -44,7 +46,7 @@ export const SuppliersPage: React.FC = () => {
         taxCode,
         paymentTermDays,
       });
-      alert('Thêm nhà cung cấp thành công!');
+      toast.success('Thêm nhà cung cấp thành công!');
       setShowModal(false);
       setName('');
       setPhone('');
@@ -52,7 +54,7 @@ export const SuppliersPage: React.FC = () => {
       setTaxCode('');
       fetchSuppliers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi thêm NCC');
+      toast.error(err.response?.data?.message || 'Lỗi khi thêm NCC');
     }
   };
 

@@ -1,29 +1,28 @@
 import axios from 'axios';
 
-const apiBase = import.meta.env.VITE_API_URL || '/api/v1';
+// Get base URL from environment or current host
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname === 'construct.bloxtcgshop.com'
+    ? 'https://construct.bloxtcgshop.com/api/v1'
+    : '/api/v1');
 
 export const api = axios.create({
-  baseURL: apiBase,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  // Strict HttpOnly cookie transport - browser automatically sends and receives cookies
+  withCredentials: true,
+  timeout: 30000,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('constructos_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
+// Response interceptor for session expiration (401)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('constructos_token');
-      localStorage.removeItem('constructos_user');
-      if (window.location.pathname !== '/login') {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
     }
@@ -31,21 +30,38 @@ api.interceptors.response.use(
   },
 );
 
-export const formatMoney = (amount: number | string | undefined): string => {
-  if (amount === undefined || amount === null) return '0 ₫';
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(num);
+// Formatting Utilities
+export const formatMoney = (amount: number | string | null | undefined): string => {
+  if (amount === null || amount === undefined || isNaN(Number(amount))) return '0';
+  return new Intl.NumberFormat('vi-VN').format(Math.round(Number(amount)));
 };
 
-export const formatNumber = (num: number | string | undefined, maxDecimals = 2): string => {
-  if (num === undefined || num === null) return '0';
-  const val = typeof num === 'string' ? parseFloat(num) : num;
+export const formatNumber = (num: number | string | null | undefined, decimals = 0): string => {
+  if (num === null || num === undefined || isNaN(Number(num))) return '0';
   return new Intl.NumberFormat('vi-VN', {
-    maximumFractionDigits: maxDecimals,
-  }).format(val);
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(Number(num));
 };
 
+export const formatDate = (dateStr: string | Date | null | undefined): string => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+};
+
+export const formatDateTime = (dateStr: string | Date | null | undefined): string => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};

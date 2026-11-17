@@ -13,6 +13,7 @@ import { ReportsModule } from './reports/reports.module';
 import { SettingsModule } from './settings/settings.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     SettingsModule,
     AuditLogsModule,
     IntegrationsModule,
+    StorageModule,
   ],
 })
 export class AppModule {}
-

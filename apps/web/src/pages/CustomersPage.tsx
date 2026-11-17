@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus, Upload, Search, Building, Phone, MapPin, X, CheckCircle } from 'lucide-react';
 import { api, formatMoney } from '../api/client';
 import { Customer } from '../types';
+import { useToast } from '../context/ToastContext';
 
 export const CustomersPage: React.FC = () => {
+  const { toast } = useToast();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export const CustomersPage: React.FC = () => {
 
   const handleCreateCustomer = async () => {
     if (!name) {
-      alert('Vui lòng nhập tên khách hàng');
+      toast.warning('Vui lòng nhập tên khách hàng');
       return;
     }
     try {
@@ -67,7 +69,7 @@ export const CustomersPage: React.FC = () => {
         payload.sites = [{ name: siteName, address: siteAddress || address }];
       }
       await api.post('/customers', payload);
-      alert('Thêm khách hàng thành công!');
+      toast.success('Thêm khách hàng thành công!');
       setShowCreateModal(false);
       setName('');
       setPhone('');
@@ -76,18 +78,18 @@ export const CustomersPage: React.FC = () => {
       setSiteAddress('');
       fetchCustomers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi thêm khách hàng');
+      toast.error(err.response?.data?.message || 'Lỗi khi thêm khách hàng');
     }
   };
 
   const handleExecuteImport = async () => {
     try {
       await api.post('/customers/import', { items: importRows });
-      alert(`Đã import thành công ${importRows.length} khách hàng kèm số dư nợ đầu kỳ!`);
+      toast.success(`Đã import thành công ${importRows.length} khách hàng kèm số dư nợ đầu kỳ!`);
       setShowImportModal(false);
       fetchCustomers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi import Excel');
+      toast.error(err.response?.data?.message || 'Lỗi khi import Excel');
     }
   };
 

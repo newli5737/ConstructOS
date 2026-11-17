@@ -10,9 +10,9 @@ export default {
         DEFAULT: '2px',
         'none': '0px',
         'sm': '2px',
-        'md': '3px',
-        'lg': '4px',
-        'xl': '6px',
+        'md': '4px',
+        'lg': '6px',
+        'xl': '8px',
       },
       colors: {
         brand: {
@@ -27,17 +27,12 @@ export default {
           800: '#9a3412',
           900: '#7c2d12',
         },
-        slate: {
-          850: '#172033',
-          950: '#0b1120',
-        }
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['"Be Vietnam Pro"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       }
     },
   },
   plugins: [],
 }
-

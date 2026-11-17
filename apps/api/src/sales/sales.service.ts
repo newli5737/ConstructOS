@@ -95,15 +95,20 @@ export class SalesService {
       throw new BadRequestException('Đơn hàng phải có ít nhất 1 sản phẩm');
     }
 
+    // Anti N+1 Optimization: Batch fetch all products in a single database query
+    const productIds: string[] = Array.from(new Set(items.map((i: any) => String(i.productId))));
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds } },
+      include: { units: true },
+    });
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
     // Calculate totals
     let subtotal = 0;
     const mappedItems: any[] = [];
 
     for (const item of items) {
-      const product = await this.prisma.product.findUnique({
-        where: { id: item.productId },
-        include: { units: true },
-      });
+      const product = productMap.get(item.productId);
       if (!product) {
         throw new BadRequestException(`Không tìm thấy sản phẩm ${item.productId}`);
       }
@@ -111,7 +116,7 @@ export class SalesService {
       // Check conversion factor
       let factor = 1;
       if (item.unitName && item.unitName !== product.baseUnit) {
-        const u = product.units.find((u) => u.unitName === item.unitName);
+        const u = product.units.find((u: any) => u.unitName === item.unitName);
         if (u) factor = Number(u.factor);
       }
 
@@ -217,16 +222,18 @@ export class SalesService {
 
     // Execute in a robust database transaction
     await this.prisma.$transaction(async (tx) => {
-      // 1. Check stock & decrement balances
+      // 1. Anti N+1: Batch load existing stock balances for all order items
+      const itemProductIds = Array.from(new Set(order.items.map((i) => i.productId)));
+      const existingBalances = await tx.stockBalance.findMany({
+        where: {
+          warehouseId: targetWarehouseId!,
+          productId: { in: itemProductIds },
+        },
+      });
+      const balanceMap = new Map(existingBalances.map((b) => [b.productId, b]));
+
       for (const item of order.items) {
-        let balance = await tx.stockBalance.findUnique({
-          where: {
-            warehouseId_productId: {
-              warehouseId: targetWarehouseId!,
-              productId: item.productId,
-            },
-          },
-        });
+        let balance = balanceMap.get(item.productId);
 
         if (!balance) {
           balance = await tx.stockBalance.create({
@@ -236,6 +243,7 @@ export class SalesService {
               quantity: 0,
             },
           });
+          balanceMap.set(item.productId, balance);
         }
 
         const currentQty = Number(balance.quantity);

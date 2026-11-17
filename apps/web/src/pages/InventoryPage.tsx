@@ -11,8 +11,10 @@ import {
 } from 'lucide-react';
 import { api, formatMoney, formatNumber } from '../api/client';
 import { StockBalanceItem, StockMovement, Warehouse, Product } from '../types';
+import { useToast } from '../context/ToastContext';
 
 export const InventoryPage: React.FC = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'balances' | 'ledger'>('balances');
   const [stockList, setStockList] = useState<StockBalanceItem[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -105,17 +107,17 @@ export const InventoryPage: React.FC = () => {
         actualQuantity: adjQuantity,
         reason: adjReason,
       });
-      alert('Đã cập nhật số lượng kiểm kê thành công!');
+      toast.success('Đã cập nhật số lượng kiểm kê thành công!');
       setShowAdjustModal(false);
       fetchStock();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi kiểm kê');
+      toast.error(err.response?.data?.message || 'Lỗi khi kiểm kê');
     }
   };
 
   const handleTransferStock = async () => {
     if (!tfProductId || !tfFromWh || !tfToWh || tfQuantity <= 0) {
-      alert('Vui lòng điền đủ thông tin chuyển kho');
+      toast.warning('Vui lòng điền đủ thông tin chuyển kho');
       return;
     }
     try {
@@ -126,11 +128,11 @@ export const InventoryPage: React.FC = () => {
         quantity: tfQuantity,
         note: tfNote,
       });
-      alert('Đã tạo phiếu điều chuyển kho thành công!');
+      toast.success('Đã tạo phiếu điều chuyển kho thành công!');
       setShowTransferModal(false);
       fetchStock();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi chuyển kho');
+      toast.error(err.response?.data?.message || 'Lỗi khi chuyển kho');
     }
   };
 

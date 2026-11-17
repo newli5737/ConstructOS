@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import { api, formatMoney } from '../api/client';
 import { Customer, Supplier, AgingReport } from '../types';
+import { useToast } from '../context/ToastContext';
 
 export const DebtPage: React.FC = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'aging' | 'customers' | 'suppliers' | 'payments'>('aging');
   const [agingData, setAgingData] = useState<AgingReport | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -71,7 +73,7 @@ export const DebtPage: React.FC = () => {
 
   const handleCreatePayment = async () => {
     if (!payPartnerId || payAmount <= 0) {
-      alert('Vui lòng chọn đối tác và nhập số tiền lớn hơn 0');
+      toast.warning('Vui lòng chọn đối tác và nhập số tiền lớn hơn 0');
       return;
     }
 
@@ -84,7 +86,7 @@ export const DebtPage: React.FC = () => {
         method: payMethod,
         note: payNote,
       });
-      alert(
+      toast.success(
         payType === 'RECEIPT'
           ? 'Đã lập phiếu thu thành công và phân bổ công nợ FIFO!'
           : 'Đã lập phiếu chi thành công!',
@@ -92,7 +94,7 @@ export const DebtPage: React.FC = () => {
       setShowPayModal(false);
       fetchData();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi lập phiếu');
+      toast.error(err.response?.data?.message || 'Lỗi khi lập phiếu');
     }
   };
 

@@ -173,16 +173,24 @@ export class PurchaseService {
         include: { supplier: true, warehouse: true, items: true },
       });
 
-      // 2. Update Warehouse stock balances & recalculate weighted average cost price
-      for (const item of mappedItems) {
-        let balance = await tx.stockBalance.findUnique({
+      // 2. Anti N+1: Batch load existing stock balances and products in single queries
+      const pIds = Array.from(new Set(mappedItems.map((i) => i.productId)));
+      const [existingBalances, existingProducts] = await Promise.all([
+        tx.stockBalance.findMany({
           where: {
-            warehouseId_productId: {
-              warehouseId: data.warehouseId,
-              productId: item.productId,
-            },
+            warehouseId: data.warehouseId,
+            productId: { in: pIds },
           },
-        });
+        }),
+        tx.product.findMany({
+          where: { id: { in: pIds } },
+        }),
+      ]);
+      const balanceMap = new Map(existingBalances.map((b) => [b.productId, b]));
+      const productMap = new Map(existingProducts.map((p) => [p.id, p]));
+
+      for (const item of mappedItems) {
+        let balance = balanceMap.get(item.productId);
 
         if (!balance) {
           balance = await tx.stockBalance.create({
@@ -192,16 +200,15 @@ export class PurchaseService {
               quantity: 0,
             },
           });
+          balanceMap.set(item.productId, balance);
         }
 
         const oldQty = Math.max(0, Number(balance.quantity));
         const inQty = Number(item.baseQuantity);
         const newQty = Number(balance.quantity) + inQty;
 
-        // Get current cost price
-        const product = await tx.product.findUnique({
-          where: { id: item.productId },
-        });
+        // Get current cost price from batch map
+        const product = productMap.get(item.productId);
 
         const oldCost = product ? Number(product.costPrice) : 0;
         // Cost per base unit = item.unitCost / factor

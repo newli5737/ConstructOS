@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
@@ -13,33 +13,11 @@ import { ProductsPage } from './pages/ProductsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
-import { User } from './types';
-import { api } from './api/client';
+import { ToastProvider } from './context/ToastContext';
+import { useAuth } from './hooks/useAuth';
 
-export const App: React.FC = () => {
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('constructos_user');
-    return saved ? JSON.parse(saved) : null;
-  });
-
-  const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem('constructos_token');
-  });
-
-  // Verify current user on mount if token exists
-  useEffect(() => {
-    if (token && !currentUser) {
-      api
-        .get('/auth/me')
-        .then((res) => {
-          setCurrentUser(res.data);
-          localStorage.setItem('constructos_user', JSON.stringify(res.data));
-        })
-        .catch(() => {
-          handleLogout();
-        });
-    }
-  }, [token]);
+export const AppContent: React.FC = () => {
+  const { currentUser, isAuthenticated, isLoading, login, logout, switchRole } = useAuth();
 
   // Global F2 keyboard shortcut to open POS
   useEffect(() => {
@@ -53,37 +31,13 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleLoginSuccess = (user: User, accessToken: string) => {
-    setCurrentUser(user);
-    setToken(accessToken);
-    localStorage.setItem('constructos_token', accessToken);
-    localStorage.setItem('constructos_user', JSON.stringify(user));
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setToken(null);
-    localStorage.removeItem('constructos_token');
-    localStorage.removeItem('constructos_user');
-  };
-
-  const handleSwitchRole = async (username: string) => {
-    const passwordMap: Record<string, string> = {
-      admin: 'Admin@123',
-      sales: 'Sales@123',
-      warehouse: 'Warehouse@123',
-      accountant: 'Accountant@123',
-    };
-    try {
-      const res = await api.post('/auth/login', {
-        username,
-        password: passwordMap[username] || 'Admin@123',
-      });
-      handleLoginSuccess(res.data.user, res.data.accessToken);
-    } catch (err) {
-      console.error('Failed to switch role', err);
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-700 font-semibold text-sm">
+        Đang khởi động constructOS ERP...
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
@@ -91,18 +45,18 @@ export const App: React.FC = () => {
         <Route
           path="/login"
           element={
-            token ? <Navigate to="/" replace /> : <LoginPage onLoginSuccess={handleLoginSuccess} />
+            isAuthenticated ? <Navigate to="/" replace /> : <LoginPage onLogin={login} />
           }
         />
 
         <Route
           path="/"
           element={
-            token ? (
+            isAuthenticated ? (
               <Layout
                 currentUser={currentUser}
-                onLogout={handleLogout}
-                onSwitchRole={handleSwitchRole}
+                onLogout={logout}
+                onSwitchRole={switchRole}
               />
             ) : (
               <Navigate to="/login" replace />
@@ -128,3 +82,10 @@ export const App: React.FC = () => {
   );
 };
 
+export const App: React.FC = () => {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
+  );
+};

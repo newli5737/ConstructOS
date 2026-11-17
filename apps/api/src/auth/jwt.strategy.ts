@@ -2,12 +2,26 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Request } from 'express';
+
+// Cookie extractor for strict HttpOnly cookie security
+const cookieExtractor = (req: Request): string | null => {
+  if (req && req.cookies) {
+    if (req.cookies['jwt']) return req.cookies['jwt'];
+    if (req.cookies['access_token']) return req.cookies['access_token'];
+  }
+  return null;
+};
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private prisma: PrismaService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // Prefer HttpOnly cookie, fallback to Authorization Bearer header for Swagger
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        cookieExtractor,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET || 'constructos-secret-key-2026',
     });
@@ -56,4 +70,3 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     };
   }
 }
-

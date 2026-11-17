@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Store, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
-import { api } from '../api/client';
+import { Store, ArrowRight, UserCheck } from 'lucide-react';
 import { User } from '../types';
 
 interface LoginPageProps {
-  onLoginSuccess: (user: User, token: string) => void;
+  onLogin: (username: string, password: string) => Promise<User>;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('Admin@123');
@@ -19,9 +18,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     try {
       setLoading(true);
       setError('');
-      const res = await api.post('/auth/login', { username: u, password: p });
-      const { accessToken, user } = res.data;
-      onLoginSuccess(user, accessToken);
+      await onLogin(u, p);
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại. Kiểm tra lại thông tin.');
@@ -37,25 +34,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 selection:bg-brand-500 selection:text-white font-sans">
+    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4 selection:bg-brand-500 selection:text-white font-sans text-slate-900">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-600 font-mono font-bold text-white text-xl shadow-lg border border-brand-500 mb-2">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-brand-600 font-mono font-bold text-white text-2xl shadow-sm rounded-sm mb-1">
             cOS
           </div>
-          <h1 className="text-2xl font-bold font-mono tracking-tight text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             constructOS
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-slate-600 font-medium">
             Hệ thống Quản lý Bán hàng & Kho Bãi Vật liệu Xây dựng
           </p>
         </div>
 
         {/* Login Box */}
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-none shadow-2xl space-y-5">
+        <div className="bg-white border border-slate-300 p-7 rounded-sm shadow-md space-y-5">
           {error && (
-            <div className="p-3 bg-red-950/60 border border-red-800 text-red-300 text-xs font-mono">
+            <div className="p-3 bg-red-50 border-l-4 border-red-600 text-red-800 text-xs font-semibold">
               {error}
             </div>
           )}
@@ -68,27 +65,27 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             className="space-y-4 text-xs"
           >
             <div>
-              <label className="font-semibold text-zinc-300 block mb-1 font-mono uppercase text-[11px]">
+              <label className="font-bold text-slate-800 block mb-1 font-mono uppercase text-xs">
                 Tên đăng nhập / Email
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-zinc-850 border border-zinc-700 p-2.5 rounded-none text-zinc-100 text-xs font-mono focus:border-brand-500 focus:bg-zinc-800 outline-none"
+                className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-sm text-slate-900 text-sm font-medium focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none"
                 required
               />
             </div>
 
             <div>
-              <label className="font-semibold text-zinc-300 block mb-1 font-mono uppercase text-[11px]">
+              <label className="font-bold text-slate-800 block mb-1 font-mono uppercase text-xs">
                 Mật khẩu
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-zinc-850 border border-zinc-700 p-2.5 rounded-none text-zinc-100 text-xs font-mono focus:border-brand-500 focus:bg-zinc-800 outline-none"
+                className="w-full bg-slate-50 border border-slate-300 p-2.5 rounded-sm text-slate-900 text-sm font-medium focus:border-brand-500 focus:bg-white focus:ring-1 focus:ring-brand-500 outline-none"
                 required
               />
             </div>
@@ -96,64 +93,70 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white font-semibold py-2.5 text-xs rounded-none transition-colors border border-brand-500 shadow-md flex items-center justify-center gap-2"
+              className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold py-3 text-xs rounded-sm transition-colors border border-brand-700 shadow-xs flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
             >
-              <span>{loading ? 'Đang xác thực...' : 'ĐĂNG NHẬP HỆ THỐNG'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              {loading ? (
+                <span>Đang kết nối hệ thống...</span>
+              ) : (
+                <>
+                  <span>Đăng nhập hệ thống</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
-          {/* Quick Demo Login Buttons */}
-          <div className="pt-4 border-t border-zinc-800">
-            <span className="text-[11px] font-mono uppercase text-zinc-400 block mb-2 font-semibold">
-              Đăng nhập nhanh (Tài khoản Demo):
-            </span>
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
+          {/* Quick Demo Login Presets */}
+          <div className="pt-4 border-t border-slate-200">
+            <div className="text-[11px] font-mono text-slate-500 mb-2 font-bold uppercase flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5 text-brand-600" />
+              <span>Đăng nhập nhanh (Tài khoản mẫu):</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => handleQuickLogin('admin', 'Admin@123')}
-                className="p-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-left transition-colors font-medium"
+                className="p-2.5 bg-slate-50 hover:bg-brand-50 hover:border-brand-300 border border-slate-200 rounded-sm text-left transition-colors cursor-pointer"
               >
-                <div className="font-bold text-white">Chủ shop / Admin</div>
-                <div className="text-[10px] text-zinc-400 font-mono">admin / Admin@123</div>
+                <div className="font-bold text-slate-900">Chủ shop / Admin</div>
+                <div className="text-[11px] text-slate-500 font-mono">admin / Admin@123</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin('sales', 'Sales@123')}
-                className="p-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-left transition-colors font-medium"
+                className="p-2.5 bg-slate-50 hover:bg-brand-50 hover:border-brand-300 border border-slate-200 rounded-sm text-left transition-colors cursor-pointer"
               >
-                <div className="font-bold text-white">Bán hàng (Sales)</div>
-                <div className="text-[10px] text-zinc-400 font-mono">sales / Sales@123</div>
+                <div className="font-bold text-slate-900">Bán hàng (Sales)</div>
+                <div className="text-[11px] text-slate-500 font-mono">sales / Sales@123</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin('warehouse', 'Warehouse@123')}
-                className="p-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-left transition-colors font-medium"
+                className="p-2.5 bg-slate-50 hover:bg-brand-50 hover:border-brand-300 border border-slate-200 rounded-sm text-left transition-colors cursor-pointer"
               >
-                <div className="font-bold text-white">Thủ kho / Bãi</div>
-                <div className="text-[10px] text-zinc-400 font-mono">warehouse / Warehouse@123</div>
+                <div className="font-bold text-slate-900">Thủ kho / Bãi</div>
+                <div className="text-[11px] text-slate-500 font-mono">warehouse / Warehouse@123</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickLogin('accountant', 'Accountant@123')}
-                className="p-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-left transition-colors font-medium"
+                className="p-2.5 bg-slate-50 hover:bg-brand-50 hover:border-brand-300 border border-slate-200 rounded-sm text-left transition-colors cursor-pointer"
               >
-                <div className="font-bold text-white">Kế toán / Quỹ</div>
-                <div className="text-[10px] text-zinc-400 font-mono">accountant / Accountant@123</div>
+                <div className="font-bold text-slate-900">Kế toán / Quỹ</div>
+                <div className="text-[11px] text-slate-500 font-mono">accountant / Accountant@123</div>
               </button>
             </div>
           </div>
         </div>
 
         {/* Footer info */}
-        <div className="text-center text-[11px] text-zinc-500 font-mono">
+        <div className="text-center text-xs text-slate-500 font-mono">
           constructOS Enterprise ERP · Domain: construct.bloxtcgshop.com
         </div>
       </div>
     </div>
   );
 };
-

@@ -10,14 +10,32 @@
   html, body {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f5;
-    color: #18181b;
+    background-color: #f8fafc;
+    color: #0f172a;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Monospace numbers for accounting and stock */
+  /* Monospace tabular numbers for accounting, prices and stock */
   .font-mono, td, th {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* High contrast scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 }
 
@@ -38,4 +56,3 @@
     overflow: visible !important;
   }
 }
-

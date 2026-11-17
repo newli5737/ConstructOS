@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Truck, Plus, CheckCircle, PackagePlus, Search, X } from 'lucide-react';
 import { api, formatMoney, formatNumber } from '../api/client';
 import { Supplier, Warehouse, Product } from '../types';
+import { useToast } from '../context/ToastContext';
 
 export const PurchaseOrdersPage: React.FC = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'receipts' | 'pos'>('receipts');
   const [receipts, setReceipts] = useState<any[]>([]);
   const [pos, setPos] = useState<any[]>([]);
@@ -101,7 +103,7 @@ export const PurchaseOrdersPage: React.FC = () => {
 
   const handleCreateReceipt = async () => {
     if (!selectedSupplierId || !selectedWarehouseId || modalItems.length === 0) {
-      alert('Vui lòng điền đủ thông tin phiếu nhập');
+      toast.warning('Vui lòng điền đủ thông tin phiếu nhập');
       return;
     }
 
@@ -122,11 +124,11 @@ export const PurchaseOrdersPage: React.FC = () => {
       };
 
       await api.post('/goods-receipts', payload);
-      alert('Đã tạo phiếu nhập kho thành công! Giá vốn bình quân và tồn kho đã được cập nhật.');
+      toast.success('Đã tạo phiếu nhập kho thành công! Giá vốn bình quân và tồn kho đã được cập nhật.');
       setShowModal(false);
       fetchData();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Lỗi khi tạo phiếu nhập kho');
+      toast.error(err.response?.data?.message || 'Lỗi khi tạo phiếu nhập kho');
     }
   };
 
