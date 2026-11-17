@@ -2,14 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('ConstructOS_API');
   const app = await NestFactory.create(AppModule);
 
   // Enable Cookie Parser for HttpOnly Cookies
-  app.use(cookieParser());
+  app.use((cookieParser as any).default ? (cookieParser as any).default() : (cookieParser as any)());
 
   // Strict CORS with Credentials for HttpOnly Cookie transport
   app.enableCors({
