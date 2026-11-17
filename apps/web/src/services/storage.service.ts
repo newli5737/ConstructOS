@@ -50,3 +50,4 @@ export const storageService = {
     return res.data;
   },
 };
+

@@ -22,3 +22,4 @@ export const authService = {
     await api.post('/auth/logout');
   },
 };
+

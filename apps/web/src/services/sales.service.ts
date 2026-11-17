@@ -50,3 +50,4 @@ export const salesService = {
     return res.data;
   },
 };
+

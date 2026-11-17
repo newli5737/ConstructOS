@@ -27,3 +27,4 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products, onUploadImag
     </div>
   );
 };
+

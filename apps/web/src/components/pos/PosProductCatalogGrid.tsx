@@ -127,3 +127,4 @@ export const PosProductCatalogGrid: React.FC<PosProductCatalogGridProps> = ({
     </div>
   );
 };
+

@@ -27,3 +27,4 @@ export const inventoryService = {
     return res.data;
   },
 };
+

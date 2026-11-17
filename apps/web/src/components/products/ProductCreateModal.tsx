@@ -289,3 +289,4 @@ export const ProductCreateModal: React.FC<ProductCreateModalProps> = ({
     </div>
   );
 };
+

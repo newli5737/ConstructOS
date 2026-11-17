@@ -124,3 +124,4 @@ export const PosCustomerHeader: React.FC<PosCustomerHeaderProps> = ({
     </div>
   );
 };
+
