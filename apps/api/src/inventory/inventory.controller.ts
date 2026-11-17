@@ -41,3 +41,4 @@ export class InventoryController {
     return this.inventoryService.transferStock(body);
   }
 }
+

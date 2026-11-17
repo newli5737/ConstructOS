@@ -383,3 +383,4 @@ export const ProductsPage: React.FC = () => {
     </div>
   );
 };
+

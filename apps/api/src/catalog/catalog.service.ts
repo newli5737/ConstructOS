@@ -181,3 +181,4 @@ export class CatalogService {
     return this.prisma.warehouse.update({ where: { id }, data });
   }
 }
+

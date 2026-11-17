@@ -8,3 +8,4 @@ import { DebtController } from './debt.controller';
   exports: [DebtService],
 })
 export class DebtModule {}
+

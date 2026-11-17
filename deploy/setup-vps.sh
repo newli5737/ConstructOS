@@ -30,3 +30,4 @@ echo " Deployment Complete!"
 echo " Frontend: http://construct.bloxtcgshop.com (or via SSL reverse proxy)"
 echo " Backend:  http://api-construct.bloxtcgshop.com (or via SSL reverse proxy)"
 echo "=============================================="
+

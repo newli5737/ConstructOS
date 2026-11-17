@@ -40,3 +40,4 @@ export class PurchaseController {
     return this.purchaseService.createGoodsReceipt(body);
   }
 }
+

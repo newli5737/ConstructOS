@@ -21,3 +21,4 @@ export class SepayController {
     return this.sepayService.getTransactions();
   }
 }
+

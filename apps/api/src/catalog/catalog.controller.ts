@@ -96,3 +96,4 @@ export class CatalogController {
     return this.catalogService.updateWarehouse(id, body);
   }
 }
+

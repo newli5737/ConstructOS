@@ -103,3 +103,4 @@ export const Navbar: React.FC<NavbarProps> = ({ currentUser, onLogout, onSwitchR
     </header>
   );
 };
+

@@ -48,3 +48,4 @@ export const formatNumber = (num: number | string | undefined, maxDecimals = 2):
     maximumFractionDigits: maxDecimals,
   }).format(val);
 };
+

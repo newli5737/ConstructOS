@@ -504,3 +504,4 @@ export const DebtPage: React.FC = () => {
     </div>
   );
 };
+

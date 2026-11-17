@@ -19,3 +19,4 @@ export class AuditLogsController {
     return this.auditLogsService.findAll(query);
   }
 }
+

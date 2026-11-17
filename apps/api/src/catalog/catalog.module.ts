@@ -8,3 +8,4 @@ import { CatalogController } from './catalog.controller';
   exports: [CatalogService],
 })
 export class CatalogModule {}
+

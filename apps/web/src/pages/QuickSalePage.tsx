@@ -731,3 +731,4 @@ export const QuickSalePage: React.FC = () => {
     </div>
   );
 };
+

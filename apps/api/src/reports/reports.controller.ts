@@ -28,3 +28,4 @@ export class ReportsController {
     return this.reportsService.getTopProducts(limit ? parseInt(limit, 10) : 10);
   }
 }
+

@@ -77,3 +77,4 @@ export class PartnersController {
     return this.partnersService.updateSupplier(id, body);
   }
 }
+

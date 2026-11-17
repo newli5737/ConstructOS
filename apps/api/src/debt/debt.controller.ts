@@ -39,3 +39,4 @@ export class DebtController {
     return this.debtService.getStatement(partnerType.toUpperCase() as any, id, from, to);
   }
 }
+

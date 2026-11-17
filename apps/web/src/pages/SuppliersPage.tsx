@@ -200,3 +200,4 @@ export const SuppliersPage: React.FC = () => {
     </div>
   );
 };
+

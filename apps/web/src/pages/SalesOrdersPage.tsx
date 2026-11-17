@@ -278,3 +278,4 @@ export const SalesOrdersPage: React.FC = () => {
     </div>
   );
 };
+

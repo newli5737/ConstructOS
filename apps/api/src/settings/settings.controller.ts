@@ -25,3 +25,4 @@ export class SettingsController {
     return this.settingsService.update(body);
   }
 }
+

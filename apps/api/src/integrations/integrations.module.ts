@@ -8,3 +8,4 @@ import { SepayController } from './sepay.controller';
   exports: [SepayService],
 })
 export class IntegrationsModule {}
+

@@ -27,3 +27,4 @@ export const Layout: React.FC<LayoutProps> = ({ currentUser, onLogout, onSwitchR
     </div>
   );
 };
+
